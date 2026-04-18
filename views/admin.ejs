@@ -1,0 +1,554 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Portal — SwiftFreight</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0a0f1e;
+      --navy2: #111827;
+      --orange: #f97316;
+      --orange2: #ea580c;
+      --slate: #1e293b;
+      --slate2: #253347;
+      --muted: #64748b;
+      --white: #ffffff;
+      --green: #22c55e;
+      --red: #ef4444;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy2);
+      color: var(--white);
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 260px; flex-shrink: 0;
+      background: var(--navy);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      display: flex; flex-direction: column;
+      padding: 32px 0;
+      position: fixed; top: 0; bottom: 0; left: 0;
+    }
+    .sidebar-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 26px; font-weight: 800;
+      padding: 0 28px 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 24px;
+    }
+    .sidebar-logo span { color: var(--orange); }
+    .sidebar-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: rgba(255,255,255,0.25);
+      padding: 0 28px; margin-bottom: 8px;
+    }
+    .sidebar-link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 28px; color: rgba(255,255,255,0.55);
+      text-decoration: none; font-size: 14px; font-weight: 500;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .sidebar-link:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+    .sidebar-link.active {
+      color: var(--white); border-left-color: var(--orange);
+      background: rgba(249,115,22,0.08);
+    }
+    .sidebar-link .icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-bottom {
+      margin-top: auto; padding: 24px 28px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-bottom a {
+      color: rgba(255,255,255,0.4); font-size: 13px; text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+      transition: color 0.2s;
+    }
+    .sidebar-bottom a:hover { color: var(--white); }
+
+    /* MAIN */
+    .main { margin-left: 260px; flex: 1; padding: 40px 40px 80px; }
+
+    /* TOPBAR */
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 36px;
+    }
+    .page-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 36px; font-weight: 800;
+    }
+    .page-title span { color: var(--orange); }
+    .admin-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.2);
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; color: var(--orange);
+    }
+
+    /* STATS CARDS */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-card {
+      background: var(--slate); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; padding: 22px 24px;
+    }
+    .stat-card-label { font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+    .stat-card-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 38px; font-weight: 800;
+    }
+    .stat-card-num.orange { color: var(--orange); }
+    .stat-card-num.green { color: var(--green); }
+
+    /* SECTIONS */
+    .section { margin-bottom: 32px; }
+    .section-head {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 700; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-head::after {
+      content: ''; flex: 1; height: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--slate); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px; padding: 28px;
+    }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    /* FORM */
+    .form-group { margin-bottom: 18px; }
+    .form-label {
+      display: block; font-size: 12px; font-weight: 600;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: rgba(255,255,255,0.4); margin-bottom: 8px;
+    }
+    .form-input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 12px 16px;
+      color: var(--white); font-family: 'DM Sans', sans-serif;
+      font-size: 14px; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .form-input::placeholder { color: rgba(255,255,255,0.2); }
+    .form-input:focus {
+      border-color: var(--orange); background: rgba(249,115,22,0.05);
+    }
+    select.form-input option { background: var(--slate); }
+
+    .btn {
+      padding: 12px 24px; border: none; border-radius: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px; font-weight: 700; letter-spacing: 0.5px;
+      cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+    }
+    .btn-primary { background: var(--orange); color: var(--white); }
+    .btn-primary:hover { background: var(--orange2); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08); color: var(--white);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.14); }
+    .btn-sm { padding: 8px 16px; font-size: 13px; }
+
+    /* MAP */
+    .map-hint {
+      font-size: 12px; color: rgba(255,255,255,0.3); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    #adminMap { height: 340px; border-radius: 10px; width: 100%; }
+    #coordDisplay {
+      margin-top: 10px; padding: 10px 14px;
+      background: rgba(249,115,22,0.08); border: 1px solid rgba(249,115,22,0.2);
+      border-radius: 6px; font-size: 13px; color: var(--orange);
+      min-height: 38px;
+    }
+
+    /* ALERT */
+    .alert {
+      padding: 14px 18px; border-radius: 8px; font-size: 14px;
+      margin-bottom: 20px; display: none;
+    }
+    .alert.success {
+      background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3);
+      color: var(--green);
+    }
+    .alert.error {
+      background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+      color: var(--red);
+    }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; padding: 12px 16px;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    td {
+      padding: 14px 16px; font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.8);
+    }
+    tr:hover td { background: rgba(255,255,255,0.03); }
+    .td-track {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px; font-weight: 700; color: var(--white);
+    }
+    .status-pill {
+      display: inline-block; padding: 3px 12px; border-radius: 100px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .pill-transit { background: rgba(249,115,22,0.15); color: var(--orange); }
+    .pill-delivered { background: rgba(34,197,94,0.15); color: var(--green); }
+    .pill-pending { background: rgba(234,179,8,0.15); color: #eab308; }
+    .action-btn {
+      background: none; border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6); padding: 5px 12px;
+      border-radius: 6px; font-size: 12px; cursor: pointer;
+      transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    }
+    .action-btn:hover {
+      border-color: var(--orange); color: var(--orange);
+      background: rgba(249,115,22,0.08);
+    }
+
+    /* ADD SHIPMENT FORM */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 24px 16px 60px; }
+      .stats-row { grid-template-columns: repeat(2,1fr); }
+      .two-col { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Swift<span>Freight</span></div>
+    <div class="sidebar-label">Main</div>
+    <a href="/admin" class="sidebar-link active">
+      <span class="icon">📦</span> Dashboard
+    </a>
+    <a href="/" class="sidebar-link">
+      <span class="icon">🔍</span> Track Shipment
+    </a>
+    <div style="margin-top:16px;"></div>
+    <div class="sidebar-label">Management</div>
+    <a href="#add-shipment" class="sidebar-link">
+      <span class="icon">➕</span> Add Shipment
+    </a>
+    <a href="#update-location" class="sidebar-link">
+      <span class="icon">📍</span> Update Location
+    </a>
+    <a href="#all-shipments" class="sidebar-link">
+      <span class="icon">📋</span> All Shipments
+    </a>
+    <div class="sidebar-bottom">
+      <a href="/">← Back to Website</a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <div class="topbar">
+      <div class="page-title">Admin <span>Portal</span></div>
+      <div class="admin-badge">🔐 Admin Access</div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-label">Total Shipments</div>
+        <div class="stat-card-num"><%= typeof shipments !== 'undefined' ? shipments.length : '—' %></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">In Transit</div>
+        <div class="stat-card-num orange">
+          <%= typeof shipments !== 'undefined' ? shipments.filter(s => (s.status||'').toLowerCase().includes('transit')).length : '—' %>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Delivered</div>
+        <div class="stat-card-num green">
+          <%= typeof shipments !== 'undefined' ? shipments.filter(s => (s.status||'').toLowerCase().includes('deliver')).length : '—' %>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Pending</div>
+        <div class="stat-card-num">
+          <%= typeof shipments !== 'undefined' ? shipments.filter(s => (s.status||'').toLowerCase().includes('pending')).length : '—' %>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD SHIPMENT -->
+    <div class="section" id="add-shipment">
+      <div class="section-head">➕ Add New Shipment</div>
+      <div class="card">
+        <div id="addAlert" class="alert"></div>
+        <form id="addForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tracking Number</label>
+              <input class="form-input" name="tracking_number" placeholder="e.g. SWF-2026-00001" required/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-input" name="status">
+                <option value="Pending">Pending</option>
+                <option value="In Transit">In Transit</option>
+                <option value="Out for Delivery">Out for Delivery</option>
+                <option value="Delivered">Delivered</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Sender Name</label>
+              <input class="form-input" name="sender_name" placeholder="Full name"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Recipient Name</label>
+              <input class="form-input" name="recipient_name" placeholder="Full name"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Origin</label>
+              <input class="form-input" name="origin" placeholder="e.g. Lagos, Nigeria"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Destination</label>
+              <input class="form-input" name="destination" placeholder="e.g. London, UK"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Weight (kg)</label>
+              <input class="form-input" name="weight" type="number" placeholder="0.0"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Est. Delivery Date</label>
+              <input class="form-input" name="estimated_delivery" type="date"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Service Type</label>
+            <select class="form-input" name="service_type">
+              <option value="Express Air">Express Air</option>
+              <option value="Standard Air">Standard Air</option>
+              <option value="Ocean Freight">Ocean Freight</option>
+              <option value="Road Freight">Road Freight</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Create Shipment →</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- UPDATE LOCATION -->
+    <div class="section" id="update-location">
+      <div class="section-head">📍 Update Shipment Location</div>
+      <div class="two-col">
+        <div class="card">
+          <div id="locAlert" class="alert"></div>
+          <div class="form-group">
+            <label class="form-label">Tracking Number</label>
+            <input class="form-input" id="locTracking" placeholder="e.g. SWF-2026-00001"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location Name</label>
+            <input class="form-input" id="locName" placeholder="e.g. Dubai Sorting Hub"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Update Status (optional)</label>
+            <select class="form-input" id="locStatus">
+              <option value="">— Keep current status —</option>
+              <option value="Pending">Pending</option>
+              <option value="In Transit">In Transit</option>
+              <option value="Out for Delivery">Out for Delivery</option>
+              <option value="Delivered">Delivered</option>
+            </select>
+          </div>
+          <div id="coordDisplay">📍 Click on the map to drop pin</div>
+          <br/>
+          <button class="btn btn-primary" onclick="saveLocation()">💾 Save Location</button>
+        </div>
+        <div class="card" style="padding: 16px;">
+          <p class="map-hint">🖱️ Click anywhere on the map to set the shipment location</p>
+          <div id="adminMap"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL SHIPMENTS TABLE -->
+    <div class="section" id="all-shipments">
+        <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tracking #</th>
+                <th>Recipient</th>
+                <th>Route</th>
+                <th>Status</th>
+                <th>Est. Delivery</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (typeof shipments !== 'undefined' && shipments.length > 0) { %>
+                <% shipments.forEach(function(s) { %>
+                  <%
+                    const sc = (s.status||'').toLowerCase();
+                    const pillClass = sc.includes('transit') ? 'pill-transit'
+                      : sc.includes('deliver') ? 'pill-delivered' : 'pill-pending';
+                  %>
+                  <tr>
+                    <td class="td-track"><%= s.tracking_number %></td>
+                    <td><%= s.recipient_name || '—' %></td>
+                    <td><%= s.origin || '—' %> → <%= s.destination || '—' %></td>
+                    <td><span class="status-pill <%= pillClass %>"><%= s.status || 'Unknown' %></span></td>
+                    <td><%= s.estimated_delivery || '—' %></td>
+                    <td>
+                      <button class="action-btn" onclick="quickFill('<%= s.tracking_number %>')">
+                        📍 Set Location
+                      </button>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" style="text-align:center; padding: 40px; color: rgba(255,255,255,0.3);">
+                    No shipments yet. Add one above.
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // --- MAP SETUP ---
+  let selLat = null, selLng = null, marker = null;
+
+  const adminMap = L.map('adminMap').setView([9.0820, 8.6753], 4);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO',
+    subdomains: 'abcd', maxZoom: 20
+  }).addTo(adminMap);
+
+  adminMap.on('click', function(e) {
+    selLat = e.latlng.lat.toFixed(6);
+    selLng = e.latlng.lng.toFixed(6);
+    document.getElementById('coordDisplay').textContent =
+      `✅ Selected: ${selLat}, ${selLng}`;
+
+    if (marker) adminMap.removeLayer(marker);
+
+    const icon = L.divIcon({
+      html: `<div style="background:#f97316;width:14px;height:14px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 4px rgba(249,115,22,0.3)"></div>`,
+      className: '', iconSize: [14,14], iconAnchor: [7,7]
+    });
+    marker = L.marker([selLat, selLng], { icon }).addTo(adminMap);
+  });
+
+  // --- SAVE LOCATION ---
+  async function saveLocation() {
+    const trackingNumber = document.getElementById('locTracking').value.trim();
+    const locationName   = document.getElementById('locName').value.trim();
+    const status         = document.getElementById('locStatus').value;
+    const alertEl        = document.getElementById('locAlert');
+
+    if (!trackingNumber || !selLat || !selLng) {
+      showAlert(alertEl, 'error', '⚠️ Please enter a tracking number and click on the map.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/update-location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trackingNumber, lat: selLat, lng: selLng, locationName, status })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showAlert(alertEl, 'success', '✅ Location saved successfully!');
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        showAlert(alertEl, 'error', '❌ Tracking number not found.');
+      }
+    } catch (err) {
+      showAlert(alertEl, 'error', '❌ Server error. Please try again.');
+    }
+  }
+
+  // --- ADD SHIPMENT ---
+  document.getElementById('addForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const alertEl = document.getElementById('addAlert');
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const res = await fetch('/add-shipment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (result.success) {
+        showAlert(alertEl, 'success', '✅ Shipment created successfully!');
+        this.reset();
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        showAlert(alertEl, 'error', '❌ ' + (result.message || 'Error creating shipment.'));
+      }
+    } catch (err) {
+      showAlert(alertEl, 'error', '❌ Server error. Please try again.');
+    }
+  });
+
+  // --- QUICK FILL ---
+  function quickFill(trackingNumber) {
+    document.getElementById('locTracking').value = trackingNumber;
+    document.getElementById('update-location').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // --- HELPER ---
+  function showAlert(el, type, msg) {
+    el.className = `alert ${type}`;
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
+  }
+</script>
+</body>
+</html>

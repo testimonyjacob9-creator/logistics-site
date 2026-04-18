@@ -1,0 +1,442 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SwiftFreight — Global Logistics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0a0f1e;
+      --navy2: #111827;
+      --orange: #f97316;
+      --orange2: #ea580c;
+      --slate: #1e293b;
+      --muted: #64748b;
+      --light: #f1f5f9;
+      --white: #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(10,15,30,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 26px; font-weight: 800; letter-spacing: 1px;
+      color: var(--white);
+    }
+    .logo span { color: var(--orange); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      color: rgba(255,255,255,0.65); text-decoration: none;
+      font-size: 14px; font-weight: 500; letter-spacing: 0.3px;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--orange); color: var(--white);
+      padding: 9px 22px; border-radius: 6px;
+      font-size: 14px; font-weight: 600; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--orange2); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 120px 48px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 65% 40%, rgba(249,115,22,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 20% 80%, rgba(249,115,22,0.06) 0%, transparent 50%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; opacity: 0.04;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 640px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3);
+      padding: 6px 16px; border-radius: 100px; margin-bottom: 28px;
+      font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--orange);
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero-badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(52px, 7vw, 88px);
+      font-weight: 800; line-height: 0.95;
+      letter-spacing: -1px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    h1 em { font-style: normal; color: var(--orange); }
+
+    .hero-sub {
+      font-size: 17px; font-weight: 300; color: rgba(255,255,255,0.6);
+      line-height: 1.7; max-width: 480px; margin-bottom: 48px;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    /* TRACK FORM */
+    .track-form {
+      display: flex; flex-direction: column; gap: 12px;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+    .track-form label {
+      font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: rgba(255,255,255,0.4);
+    }
+    .input-row { display: flex; gap: 0; }
+    .track-form input {
+      flex: 1;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-right: none;
+      border-radius: 8px 0 0 8px;
+      padding: 16px 20px;
+      color: var(--white); font-family: 'DM Sans', sans-serif;
+      font-size: 15px; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .track-form input::placeholder { color: rgba(255,255,255,0.25); }
+    .track-form input:focus {
+      border-color: var(--orange);
+      background: rgba(249,115,22,0.05);
+    }
+    .track-btn {
+      background: var(--orange); color: var(--white);
+      border: none; padding: 16px 28px;
+      border-radius: 0 8px 8px 0;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .track-btn:hover { background: var(--orange2); }
+    .track-btn:active { transform: scale(0.98); }
+
+    /* STATS */
+    .stats-bar {
+      display: flex; gap: 48px; margin-top: 56px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+    .stat-item {}
+    .stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 36px; font-weight: 800; color: var(--white);
+    }
+    .stat-num span { color: var(--orange); }
+    .stat-label {
+      font-size: 12px; color: rgba(255,255,255,0.4);
+      font-weight: 400; letter-spacing: 0.5px;
+    }
+
+    /* HERO RIGHT - decorative */
+    .hero-visual {
+      position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+      width: 45%; pointer-events: none;
+      animation: fadeIn 1s 0.5s ease both;
+    }
+    .hero-card {
+      background: rgba(30,41,59,0.7);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 24px;
+      backdrop-filter: blur(20px);
+      margin: 12px; width: 320px;
+    }
+    .hero-card:first-child { margin-left: auto; margin-right: 80px; }
+    .hero-card:last-child { margin-left: 60px; }
+    .card-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .card-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--orange);
+      background: rgba(249,115,22,0.1); padding: 4px 10px; border-radius: 4px;
+    }
+    .card-status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+    .card-id { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; }
+    .card-route { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+    .card-progress { background: rgba(255,255,255,0.1); border-radius: 4px; height: 4px; }
+    .card-progress-fill { background: var(--orange); height: 4px; border-radius: 4px; }
+
+    /* FEATURES SECTION */
+    .features {
+      padding: 100px 48px;
+      background: var(--navy2);
+      position: relative;
+    }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--orange);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(36px, 4vw, 52px); font-weight: 800;
+      margin-bottom: 60px; line-height: 1.1;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .feature-card {
+      background: var(--slate);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px; padding: 36px 32px;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--orange), transparent);
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .feature-card:hover { border-color: rgba(249,115,22,0.3); transform: translateY(-4px); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: rgba(249,115,22,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 20px;
+    }
+    .feature-card h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 700; margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #060b14;
+      padding: 60px 48px 32px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 32px;
+    }
+    .footer-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px; font-weight: 800;
+    }
+    .footer-logo span { color: var(--orange); }
+    .footer-tagline { font-size: 13px; color: rgba(255,255,255,0.35); margin-top: 6px; }
+    .footer-links { display: flex; gap: 48px; }
+    .footer-col h4 {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: rgba(255,255,255,0.4);
+      margin-bottom: 16px;
+    }
+    .footer-col a {
+      display: block; color: rgba(255,255,255,0.6);
+      text-decoration: none; font-size: 14px; margin-bottom: 10px;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--white); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-copy { font-size: 13px; color: rgba(255,255,255,0.3); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hero { padding: 100px 24px 60px; }
+      .hero-visual { display: none; }
+      .stats-bar { gap: 24px; flex-wrap: wrap; }
+      .features { padding: 60px 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      footer { padding: 48px 24px 24px; }
+      .footer-top { flex-direction: column; gap: 32px; }
+      .footer-links { flex-wrap: wrap; gap: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Swift<span>Freight</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Track</a></li>
+    <li><a href="#">Services</a></li>
+    <li><a href="#">Solutions</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+  <a href="/admin" class="nav-cta">Admin Portal</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Live Tracking Active</div>
+    <h1>Move Cargo.<br><em>Track</em> Every<br>Mile.</h1>
+    <p class="hero-sub">Real-time shipment visibility across air, sea, and land. Know exactly where your freight is — anytime, anywhere.</p>
+
+    <form class="track-form" action="/track" method="GET">
+      <label for="trackingNumber">Enter your tracking number</label>
+      <div class="input-row">
+        <input type="text" id="trackingNumber" name="trackingNumber"
+               placeholder="e.g. SWF-2026-00847" autocomplete="off" required />
+        <button type="submit" class="track-btn">Track Now →</button>
+      </div>
+    </form>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-num">98<span>%</span></div>
+        <div class="stat-label">On-Time Delivery</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">150<span>+</span></div>
+        <div class="stat-label">Countries Covered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">2M<span>+</span></div>
+        <div class="stat-label">Shipments Tracked</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-card">
+      <div class="card-row">
+        <div class="card-tag">In Transit</div>
+        <div class="card-status-dot"></div>
+      </div>
+      <div class="card-id">SWF-2026-00847</div>
+      <div class="card-route">Lagos → London Heathrow</div>
+      <div class="card-progress"><div class="card-progress-fill" style="width:68%"></div></div>
+    </div>
+    <div class="hero-card" style="margin-top:16px;">
+      <div class="card-row">
+        <div class="card-tag">Delivered</div>
+        <span style="color:#22c55e; font-size:18px;">✓</span>
+      </div>
+      <div class="card-id">SWF-2026-00391</div>
+      <div class="card-route">Dubai → New York JFK</div>
+      <div class="card-progress"><div class="card-progress-fill" style="width:100%; background:#22c55e;"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="section-label">Why SwiftFreight</div>
+  <div class="section-title">Built for Speed.<br>Designed for Trust.</div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🗺️</div>
+      <h3>Live Map Tracking</h3>
+      <p>See your shipment's exact position on an interactive map updated in real time across every checkpoint.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✈️</div>
+      <h3>Air & Sea Freight</h3>
+      <p>Full visibility across multimodal logistics — air cargo, ocean freight, and last-mile land delivery.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔔</div>
+      <h3>Instant Alerts</h3>
+      <p>Proactive notifications at every milestone so you're never in the dark about your shipment.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <h3>Secure Handling</h3>
+      <p>Every package insured and handled with strict chain-of-custody protocols end to end.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📦</div>
+      <h3>All Cargo Types</h3>
+      <p>From documents to oversized freight — we handle any volume, any weight, any destination.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌍</div>
+      <h3>Global Network</h3>
+      <p>Over 150 countries in our network with trusted local partners for smooth last-mile delivery.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">Swift<span>Freight</span></div>
+      <div class="footer-tagline">Moving the world's cargo, reliably.</div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <a href="#">Air Freight</a>
+        <a href="#">Sea Freight</a>
+        <a href="#">Warehousing</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Track Shipment</a>
+        <a href="#">Contact Us</a>
+        <a href="/admin">Admin Login</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 SwiftFreight Logistics. All rights reserved.</div>
+    <div class="footer-copy">Privacy · Terms · Cookies</div>
+  </div>
+</footer>
+
+</body>
+</html>
