@@ -3,229 +3,137 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tracking — <%= shipment ? shipment.tracking_number : 'Not Found' %> | SwiftFreight</title>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <title>Tracking — SwiftFreight</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --navy: #0a0f1e;
-      --navy2: #111827;
-      --orange: #f97316;
-      --orange2: #ea580c;
-      --slate: #1e293b;
-      --muted: #64748b;
-      --white: #ffffff;
-      --green: #22c55e;
-      --yellow: #eab308;
-      --red: #ef4444;
+      --navy: #0a0f1e; --navy2: #111827; --orange: #f97316;
+      --orange2: #ea580c; --slate: #1e293b; --white: #ffffff;
+      --green: #22c55e; --yellow: #eab308; --red: #ef4444;
     }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--navy);
-      color: var(--white);
-      min-height: 100vh;
-    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--white); min-height: 100vh; }
 
     /* NAV */
     nav {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 48px;
-      background: rgba(10,15,30,0.95);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      position: sticky; top: 0; z-index: 200;
-      backdrop-filter: blur(16px);
+      padding: 16px 40px; background: rgba(10,15,30,0.97);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      position: sticky; top: 0; z-index: 200; backdrop-filter: blur(16px);
     }
-    .logo {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 26px; font-weight: 800;
-      color: var(--white); text-decoration: none;
-    }
+    .logo { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; color: var(--white); text-decoration: none; }
     .logo span { color: var(--orange); }
     .nav-back {
-      display: flex; align-items: center; gap: 8px;
-      color: rgba(255,255,255,0.6); text-decoration: none;
-      font-size: 14px; transition: color 0.2s;
+      display: flex; align-items: center; gap: 6px;
+      color: rgba(255,255,255,0.55); text-decoration: none;
+      font-size: 13px; font-weight: 500; transition: color 0.2s;
+      background: rgba(255,255,255,0.06); padding: 7px 14px; border-radius: 6px;
     }
-    .nav-back:hover { color: var(--white); }
+    .nav-back:hover { color: var(--white); background: rgba(255,255,255,0.1); }
 
     /* PAGE */
-    .page { max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px; }
+    .page { max-width: 1060px; margin: 0 auto; padding: 40px 20px 80px; }
 
     /* NOT FOUND */
-    .not-found {
-      text-align: center; padding: 100px 24px;
-    }
-    .not-found .icon { font-size: 64px; margin-bottom: 24px; }
-    .not-found h2 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 42px; margin-bottom: 12px;
-    }
-    .not-found p { color: rgba(255,255,255,0.5); font-size: 16px; margin-bottom: 28px; }
+    .not-found { text-align: center; padding: 100px 20px; }
+    .not-found .nf-icon { font-size: 64px; margin-bottom: 20px; }
+    .not-found h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 800; margin-bottom: 12px; }
+    .not-found p { color: rgba(255,255,255,0.5); font-size: 15px; margin-bottom: 28px; line-height: 1.6; }
     .btn-back {
-      display: inline-block;
+      display: inline-flex; align-items: center; gap: 8px;
       background: var(--orange); color: var(--white);
       padding: 12px 28px; border-radius: 8px;
-      font-weight: 600; text-decoration: none;
-      transition: background 0.2s;
+      font-weight: 600; text-decoration: none; transition: background 0.2s;
     }
     .btn-back:hover { background: var(--orange2); }
 
     /* HEADER */
     .track-header {
       display: flex; align-items: flex-start; justify-content: space-between;
-      margin-bottom: 40px; flex-wrap: wrap; gap: 20px;
+      margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
     }
-    .track-id-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--orange); margin-bottom: 8px;
-    }
-    .track-id {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 48px; font-weight: 800; line-height: 1;
-    }
-    .track-route {
-      color: rgba(255,255,255,0.5); font-size: 15px; margin-top: 8px;
-    }
+    .track-id-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); margin-bottom: 6px; }
+    .track-id { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(32px, 6vw, 52px); font-weight: 900; line-height: 1; }
+    .track-route { color: rgba(255,255,255,0.45); font-size: 14px; margin-top: 6px; }
+
     .status-badge {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 20px; border-radius: 100px;
+      padding: 9px 18px; border-radius: 100px;
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 16px; font-weight: 700; letter-spacing: 0.5px;
-      text-transform: uppercase;
+      font-size: 15px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
     }
-    .status-badge.in-transit {
-      background: rgba(249,115,22,0.15);
-      border: 1px solid rgba(249,115,22,0.4);
-      color: var(--orange);
-    }
-    .status-badge.delivered {
-      background: rgba(34,197,94,0.15);
-      border: 1px solid rgba(34,197,94,0.4);
-      color: var(--green);
-    }
-    .status-badge.pending {
-      background: rgba(234,179,8,0.15);
-      border: 1px solid rgba(234,179,8,0.4);
-      color: var(--yellow);
-    }
-    .status-badge.issue {
-      background: rgba(239,68,68,0.15);
-      border: 1px solid rgba(239,68,68,0.4);
-      color: var(--red);
-    }
-    .status-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: currentColor;
-    }
+    .badge-transit { background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.35); color: var(--orange); }
+    .badge-delivered { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.35); color: var(--green); }
+    .badge-pending { background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.35); color: var(--yellow); }
+    .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 
-    /* GRID */
-    .content-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
-      margin-bottom: 24px;
-    }
-    .card {
-      background: var(--slate);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 16px; padding: 28px;
-    }
-    .card-title {
-      font-size: 11px; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; color: rgba(255,255,255,0.35);
-      margin-bottom: 20px;
-    }
+    /* PROGRESS BAR */
+    .progress-wrap { background: rgba(255,255,255,0.07); border-radius: 4px; height: 5px; margin-bottom: 28px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--orange2), var(--orange)); transition: width 1.2s ease; }
 
-    /* DETAILS */
-    .detail-rows { display: flex; flex-direction: column; gap: 16px; }
-    .detail-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding-bottom: 16px;
+    /* MAP */
+    .map-card { background: var(--slate); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+    .map-card-head {
+      padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-    .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .detail-key { font-size: 13px; color: rgba(255,255,255,0.4); }
-    .detail-val { font-size: 14px; font-weight: 500; text-align: right; }
+    .map-card-head h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 19px; font-weight: 700; }
+    .map-loc-tag { font-size: 12px; color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 6px; }
+    #map { height: 360px; width: 100%; }
+    .map-empty { height: 180px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: rgba(255,255,255,0.25); }
+    .map-empty span { font-size: 38px; }
 
-    /* PROGRESS */
-    .progress-steps { display: flex; flex-direction: column; gap: 0; }
-    .step {
-      display: flex; align-items: flex-start; gap: 16px;
-      position: relative;
-    }
-    .step:not(:last-child)::after {
-      content: '';
-      position: absolute; left: 11px; top: 28px;
-      width: 2px; height: calc(100% - 4px);
-      background: rgba(255,255,255,0.1);
-    }
+    /* GRID */
+    .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .card { background: var(--slate); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 24px; }
+    .card-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 18px; }
+
+    /* DETAILS */
+    .detail-list { display: flex; flex-direction: column; gap: 0; }
+    .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-key { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .detail-val { font-size: 13px; font-weight: 500; text-align: right; max-width: 60%; }
+    .detail-val.highlight { color: var(--orange); }
+
+    /* STEPS */
+    .steps { display: flex; flex-direction: column; }
+    .step { display: flex; align-items: flex-start; gap: 14px; position: relative; }
+    .step:not(:last-child)::after { content: ''; position: absolute; left: 11px; top: 28px; width: 2px; height: calc(100% - 4px); background: rgba(255,255,255,0.08); }
     .step.done:not(:last-child)::after { background: var(--orange); }
     .step-dot {
       width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
-      border: 2px solid rgba(255,255,255,0.15);
-      background: var(--navy);
+      border: 2px solid rgba(255,255,255,0.15); background: var(--navy);
       display: flex; align-items: center; justify-content: center;
-      font-size: 10px; z-index: 1; margin-top: 14px;
+      font-size: 10px; z-index: 1; margin-top: 12px;
     }
-    .step.done .step-dot {
-      background: var(--orange); border-color: var(--orange); color: var(--white);
-    }
-    .step.active .step-dot {
-      background: var(--navy); border-color: var(--orange);
-      box-shadow: 0 0 0 4px rgba(249,115,22,0.2);
-    }
-    .step-body { padding: 12px 0 24px; }
-    .step-title {
-      font-weight: 600; font-size: 14px;
-      color: rgba(255,255,255,0.5);
-    }
+    .step.done .step-dot { background: var(--orange); border-color: var(--orange); color: white; }
+    .step.active .step-dot { border-color: var(--orange); box-shadow: 0 0 0 4px rgba(249,115,22,0.2); }
+    .step-body { padding: 10px 0 22px; }
+    .step-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4); }
     .step.done .step-title, .step.active .step-title { color: var(--white); }
-    .step-date { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 3px; }
-    .step.active .step-date { color: var(--orange); }
+    .step-sub { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 3px; }
+    .step.active .step-sub { color: var(--orange); }
 
-    /* MAP */
-    .map-card {
-      background: var(--slate);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 16px; overflow: hidden;
-      margin-bottom: 24px;
+    /* BOTTOM */
+    .bottom-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+    .bottom-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 24px; border-radius: 8px;
+      font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.2s;
     }
-    .map-card-header {
-      padding: 20px 28px;
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-    .map-card-header h3 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 20px; font-weight: 700;
-    }
-    .map-location-tag {
-      font-size: 13px; color: rgba(255,255,255,0.5);
-      background: rgba(255,255,255,0.05);
-      padding: 6px 14px; border-radius: 6px;
-    }
-    #map { height: 380px; width: 100%; }
-    .map-no-location {
-      height: 200px; display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 12px; color: rgba(255,255,255,0.3);
-    }
-    .map-no-location span { font-size: 36px; }
+    .btn-orange { background: var(--orange); color: white; }
+    .btn-orange:hover { background: var(--orange2); }
+    .btn-wa { background: rgba(37,211,102,0.12); border: 1px solid rgba(37,211,102,0.25); color: #25D366; }
+    .btn-wa:hover { background: #25D366; color: white; }
 
-    /* PROGRESS BAR */
-    .progress-bar-wrap {
-      background: rgba(255,255,255,0.08); border-radius: 4px; height: 6px;
-      margin-bottom: 24px; overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%; border-radius: 4px;
-      background: linear-gradient(90deg, var(--orange2), var(--orange));
-      transition: width 1s ease;
-    }
-
-    @media (max-width: 768px) {
-      nav { padding: 16px 20px; }
-      .page { padding: 32px 16px 60px; }
-      .track-id { font-size: 32px; }
+    @media (max-width: 700px) {
+      nav { padding: 14px 16px; }
+      .page { padding: 24px 14px 60px; }
       .content-grid { grid-template-columns: 1fr; }
+      #map { height: 280px; }
     }
   </style>
 </head>
@@ -240,134 +148,97 @@
 
 <% if (!shipment) { %>
   <div class="not-found">
-    <div class="icon">📭</div>
+    <div class="nf-icon">📭</div>
     <h2>Shipment Not Found</h2>
-    <p>We couldn't find a shipment with that tracking number.<br>Please double-check and try again.</p>
+    <p>We couldn't find a shipment with that tracking number.<br/>Please double-check and try again.</p>
     <a href="/" class="btn-back">← Back to Tracking</a>
   </div>
 
 <% } else { %>
-
   <%
     const s = shipment;
-    const statusClass = (s.status || '').toLowerCase().includes('transit') ? 'in-transit'
-      : (s.status || '').toLowerCase().includes('deliver') ? 'delivered'
-      : (s.status || '').toLowerCase().includes('pending') ? 'pending'
-      : 'in-transit';
+    const st = (s.status || '').toLowerCase();
+    const badgeClass = st.includes('transit') ? 'badge-transit'
+      : st.includes('deliver') ? 'badge-delivered' : 'badge-pending';
 
     const steps = [
-      { label: 'Order Placed', done: true },
-      { label: 'Picked Up', done: true },
-      { label: 'In Transit', done: statusClass === 'in-transit' || statusClass === 'delivered', active: statusClass === 'in-transit' },
-      { label: 'Out for Delivery', done: statusClass === 'delivered', active: false },
-      { label: 'Delivered', done: statusClass === 'delivered' }
+      { label: 'Order Placed',     sub: 'Confirmed',       done: true,  active: false },
+      { label: 'Picked Up',        sub: 'Collected',       done: true,  active: false },
+      { label: 'In Transit',       sub: 'On the way',      done: st.includes('transit') || st.includes('deliver'), active: st.includes('transit') && !st.includes('deliver') },
+      { label: 'Out for Delivery', sub: 'Almost there',    done: st.includes('deliver'), active: st.includes('out') },
+      { label: 'Delivered',        sub: 'Complete',        done: st.includes('deliver') && !st.includes('out'), active: false }
     ];
 
-    const progressPct = statusClass === 'delivered' ? 100
-      : statusClass === 'in-transit' ? 60
-      : statusClass === 'pending' ? 20 : 40;
+    const pct = st.includes('deliver') && !st.includes('out') ? 100
+      : st.includes('out') ? 85
+      : st.includes('transit') ? 60
+      : st.includes('pending') ? 15 : 30;
   %>
 
   <div class="track-header">
     <div>
       <div class="track-id-label">Tracking Number</div>
       <div class="track-id"><%= s.tracking_number %></div>
-      <% if (s.origin && s.destination) { %>
-        <div class="track-route">📍 <%= s.origin %> &nbsp;→&nbsp; <%= s.destination %></div>
+      <% if (s.origin || s.destination) { %>
+        <div class="track-route">📍 <%= s.origin || '—' %> &nbsp;→&nbsp; <%= s.destination || '—' %></div>
       <% } %>
     </div>
-    <div class="status-badge <%= statusClass %>">
-      <div class="status-dot"></div>
+    <div class="status-badge <%= badgeClass %>">
+      <div class="badge-dot"></div>
       <%= s.status || 'In Transit' %>
     </div>
   </div>
 
-  <div class="progress-bar-wrap">
-    <div class="progress-bar-fill" style="width: <%= progressPct %>%"></div>
+  <div class="progress-wrap">
+    <div class="progress-fill" style="width:<%= pct %>%"></div>
   </div>
 
   <!-- MAP -->
   <div class="map-card">
-    <div class="map-card-header">
+    <div class="map-card-head">
       <h3>📍 Live Location</h3>
       <% if (s.location_name) { %>
-        <div class="map-location-tag"><%= s.location_name %></div>
+        <div class="map-loc-tag"><%= s.location_name %></div>
       <% } %>
     </div>
     <% if (s.lat && s.lng) { %>
       <div id="map"></div>
     <% } else { %>
-      <div class="map-no-location">
+      <div class="map-empty">
         <span>🗺️</span>
         <p>Location update not yet available</p>
       </div>
     <% } %>
   </div>
 
+  <!-- DETAILS + STEPS -->
   <div class="content-grid">
-    <!-- SHIPMENT DETAILS -->
     <div class="card">
       <div class="card-title">Shipment Details</div>
-      <div class="detail-rows">
-        <div class="detail-row">
-          <span class="detail-key">Tracking #</span>
-          <span class="detail-val"><%= s.tracking_number %></span>
-        </div>
-        <% if (s.sender_name) { %>
-        <div class="detail-row">
-          <span class="detail-key">Sender</span>
-          <span class="detail-val"><%= s.sender_name %></span>
-        </div>
-        <% } %>
-        <% if (s.recipient_name) { %>
-        <div class="detail-row">
-          <span class="detail-key">Recipient</span>
-          <span class="detail-val"><%= s.recipient_name %></span>
-        </div>
-        <% } %>
-        <% if (s.weight) { %>
-        <div class="detail-row">
-          <span class="detail-key">Weight</span>
-          <span class="detail-val"><%= s.weight %> kg</span>
-        </div>
-        <% } %>
-        <% if (s.service_type) { %>
-        <div class="detail-row">
-          <span class="detail-key">Service</span>
-          <span class="detail-val"><%= s.service_type %></span>
-        </div>
-        <% } %>
-        <% if (s.estimated_delivery) { %>
-        <div class="detail-row">
-          <span class="detail-key">Est. Delivery</span>
-          <span class="detail-val" style="color: var(--orange)"><%= s.estimated_delivery %></span>
-        </div>
-        <% } %>
-        <% if (s.location_name) { %>
-        <div class="detail-row">
-          <span class="detail-key">Last Location</span>
-          <span class="detail-val"><%= s.location_name %></span>
-        </div>
-        <% } %>
+      <div class="detail-list">
+        <div class="detail-row"><span class="detail-key">Tracking #</span><span class="detail-val"><%= s.tracking_number %></span></div>
+        <% if (s.recipient_name) { %><div class="detail-row"><span class="detail-key">Recipient</span><span class="detail-val"><%= s.recipient_name %></span></div><% } %>
+        <% if (s.sender_name) { %><div class="detail-row"><span class="detail-key">Sender</span><span class="detail-val"><%= s.sender_name %></span></div><% } %>
+        <% if (s.origin) { %><div class="detail-row"><span class="detail-key">Origin</span><span class="detail-val"><%= s.origin %></span></div><% } %>
+        <% if (s.destination) { %><div class="detail-row"><span class="detail-key">Destination</span><span class="detail-val"><%= s.destination %></span></div><% } %>
+        <% if (s.weight) { %><div class="detail-row"><span class="detail-key">Weight</span><span class="detail-val"><%= s.weight %> kg</span></div><% } %>
+        <% if (s.service_type) { %><div class="detail-row"><span class="detail-key">Service</span><span class="detail-val"><%= s.service_type %></span></div><% } %>
+        <% if (s.estimated_delivery) { %><div class="detail-row"><span class="detail-key">Est. Delivery</span><span class="detail-val highlight"><%= s.estimated_delivery %></span></div><% } %>
+        <% if (s.location_name) { %><div class="detail-row"><span class="detail-key">Last Location</span><span class="detail-val"><%= s.location_name %></span></div><% } %>
       </div>
     </div>
 
-    <!-- PROGRESS STEPS -->
     <div class="card">
       <div class="card-title">Delivery Progress</div>
-      <div class="progress-steps">
-        <% steps.forEach(function(step, i) { %>
+      <div class="steps">
+        <% steps.forEach(function(step) { %>
           <div class="step <%= step.done ? 'done' : '' %> <%= step.active ? 'active' : '' %>">
             <div class="step-dot"><% if (step.done) { %>✓<% } %></div>
             <div class="step-body">
               <div class="step-title"><%= step.label %></div>
-              <% if (step.active) { %>
-                <div class="step-date">Currently here</div>
-              <% } else if (step.done) { %>
-                <div class="step-date">Completed</div>
-              <% } else { %>
-                <div class="step-date">Pending</div>
-              <% } %>
+              <div class="step-sub">
+                <% if (step.active) { %>Currently here<% } else if (step.done) { %><%= step.sub %><% } else { %>Pending<% } %>
+              </div>
             </div>
           </div>
         <% }); %>
@@ -375,8 +246,9 @@
     </div>
   </div>
 
-  <div style="text-align:center; margin-top: 16px;">
-    <a href="/" class="btn-back">← Track Another Shipment</a>
+  <div class="bottom-row">
+    <a href="/" class="bottom-btn btn-orange">← Track Another Shipment</a>
+    <a href="https://wa.me/84583863560" target="_blank" class="bottom-btn btn-wa">💬 Contact on WhatsApp</a>
   </div>
 
 <% } %>
@@ -385,12 +257,7 @@
 <% if (shipment && shipment.lat && shipment.lng) { %>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  const lat = <%= shipment.lat %>;
-  const lng = <%= shipment.lng %>;
-  const locationName = "<%= shipment.location_name || 'Package Location' %>";
-
-  const map = L.map('map', { zoomControl: true, scrollWheelZoom: false })
-               .setView([lat, lng], 13);
+  const map = L.map('map', { scrollWheelZoom: false }).setView([<%= shipment.lat %>, <%= shipment.lng %>], 13);
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO',
@@ -398,19 +265,13 @@
   }).addTo(map);
 
   const icon = L.divIcon({
-    html: `<div style="
-      background: #f97316; width: 16px; height: 16px;
-      border-radius: 50%; border: 3px solid white;
-      box-shadow: 0 0 0 4px rgba(249,115,22,0.4), 0 4px 12px rgba(0,0,0,0.5);
-    "></div>`,
-    className: '', iconSize: [16, 16], iconAnchor: [8, 8]
+    html: `<div style="background:#f97316;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 5px rgba(249,115,22,0.3),0 4px 14px rgba(0,0,0,0.5);"></div>`,
+    className: '', iconSize: [16,16], iconAnchor: [8,8]
   });
 
-  L.marker([lat, lng], { icon })
+  L.marker([<%= shipment.lat %>, <%= shipment.lng %>], { icon })
    .addTo(map)
-   .bindPopup(`<b style="color:#f97316">${locationName}</b>`, {
-     className: 'custom-popup'
-   })
+   .bindPopup('<b style="color:#f97316"><%= shipment.location_name || "Package Location" %></b>')
    .openPopup();
 </script>
 <% } %>

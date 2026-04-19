@@ -3,440 +3,711 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SwiftFreight — Global Logistics</title>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <title>SwiftFreight — Global Logistics Since 1999</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,fr,ar,zh-CN,es,de,pt,ru,ja,ko,hi,yo,ha,ig,sw',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --navy: #0a0f1e;
-      --navy2: #111827;
-      --orange: #f97316;
-      --orange2: #ea580c;
-      --slate: #1e293b;
-      --muted: #64748b;
-      --light: #f1f5f9;
-      --white: #ffffff;
+      --navy: #0a0f1e; --navy2: #111827; --orange: #f97316;
+      --orange2: #ea580c; --slate: #1e293b; --white: #ffffff; --green: #22c55e;
     }
-
     html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--white); overflow-x: hidden; }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--navy);
-      color: var(--white);
-      min-height: 100vh;
-      overflow-x: hidden;
+    /* TRANSLATE */
+    .goog-te-banner-frame { display: none !important; }
+    body { top: 0 !important; }
+    .skiptranslate { display: none !important; }
+    .goog-te-gadget-simple {
+      background: rgba(255,255,255,0.15) !important;
+      border: 1px solid rgba(255,255,255,0.3) !important;
+      border-radius: 4px !important; padding: 2px 8px !important;
+      font-size: 11px !important; color: white !important; cursor: pointer;
     }
+    .goog-te-gadget-simple span { color: white !important; }
+    .goog-te-gadget-simple .goog-te-menu-value span { color: white !important; }
+
+    /* TOP BAR */
+    .top-bar {
+      background: var(--orange); padding: 7px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .top-bar-left { color: white; font-size: 12px; font-weight: 600; letter-spacing: 0.3px; }
+    .top-bar-right { display: flex; align-items: center; gap: 20px; }
+    .top-bar-link {
+      color: white; text-decoration: none; font-size: 12px; font-weight: 600;
+      display: flex; align-items: center; gap: 5px;
+      opacity: 0.9; transition: opacity 0.2s;
+    }
+    .top-bar-link:hover { opacity: 1; }
 
     /* NAV */
     nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      position: sticky; top: 0; z-index: 500;
+      background: rgba(10,15,30,0.97);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      backdrop-filter: blur(20px);
+    }
+    .nav-inner {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 48px;
-      background: rgba(10,15,30,0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 48px; height: 72px;
     }
-    .logo {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 26px; font-weight: 800; letter-spacing: 1px;
-      color: var(--white);
-    }
+    .logo-wrap { text-decoration: none; }
+    .logo { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 900; color: var(--white); line-height: 1; }
     .logo span { color: var(--orange); }
-    .nav-links { display: flex; gap: 32px; list-style: none; }
-    .nav-links a {
+    .logo-sub { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 2px; }
+
+    /* DESKTOP MENU */
+    .desktop-menu { display: flex; align-items: center; gap: 2px; list-style: none; }
+    .desktop-menu > li { position: relative; }
+    .desktop-menu > li > a {
+      display: flex; align-items: center; gap: 5px;
+      color: rgba(255,255,255,0.7); text-decoration: none;
+      font-size: 14px; font-weight: 500; padding: 8px 14px;
+      border-radius: 6px; transition: all 0.2s; cursor: pointer;
+    }
+    .desktop-menu > li > a:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+    .arrow { font-size: 9px; transition: transform 0.25s; }
+    .desktop-menu > li:hover .arrow { transform: rotate(180deg); }
+
+    .dropdown {
+      position: absolute; top: calc(100% + 10px); left: 0;
+      background: var(--slate); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 8px; min-width: 210px;
+      opacity: 0; visibility: hidden; transform: translateY(-10px);
+      transition: all 0.25s ease; z-index: 200;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+    }
+    .desktop-menu > li:hover .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown a {
+      display: flex; align-items: center; gap: 10px;
       color: rgba(255,255,255,0.65); text-decoration: none;
-      font-size: 14px; font-weight: 500; letter-spacing: 0.3px;
-      transition: color 0.2s;
+      font-size: 13px; padding: 10px 14px; border-radius: 8px; transition: all 0.15s;
     }
-    .nav-links a:hover { color: var(--white); }
-    .nav-cta {
-      background: var(--orange); color: var(--white);
-      padding: 9px 22px; border-radius: 6px;
-      font-size: 14px; font-weight: 600; text-decoration: none;
-      transition: background 0.2s;
+    .dropdown a:hover { color: var(--white); background: rgba(249,115,22,0.12); }
+    .dropdown-icon { font-size: 16px; width: 22px; text-align: center; }
+    .dropdown-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 6px 8px; }
+
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-wa {
+display: flex; align-items: center; gap: 6px;
+      background: #25D366; color: white; padding: 8px 16px;
+      border-radius: 6px; font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: background 0.2s;
     }
-    .nav-cta:hover { background: var(--orange2); }
+    .nav-wa:hover { background: #1da851; }
+    .nav-track {
+      background: var(--orange); color: white; padding: 8px 18px;
+      border-radius: 6px; font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: background 0.2s;
+    }
+    .nav-track:hover { background: var(--orange2); }
+
+    /* HAMBURGER */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 6px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: white; border-radius: 2px; transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: translateX(-8px); }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* MOBILE MENU OVERLAY */
+    .mobile-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      z-index: 390; opacity: 0; transition: opacity 0.3s;
+    }
+    .mobile-overlay.open { opacity: 1; }
+
+    /* MOBILE MENU PANEL */
+    .mobile-menu {
+      position: fixed; top: 0; right: 0; bottom: 0; width: min(320px, 85vw);
+      background: var(--navy); z-index: 400; display: flex; flex-direction: column;
+      transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+    }
+    .mobile-menu.open { transform: translateX(0); }
+    .mobile-menu-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 22px; border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .mm-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; }
+    .mm-logo span { color: var(--orange); }
+    .mm-close {
+      background: rgba(255,255,255,0.08); border: none; color: white;
+      width: 34px; height: 34px; border-radius: 50%; font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .mobile-menu-body { flex: 1; overflow-y: auto; }
+    .mm-item { border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .mm-link, .mm-section-btn {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 15px 22px; color: rgba(255,255,255,0.85); text-decoration: none;
+      font-size: 15px; font-weight: 500; background: none; border: none;
+      width: 100%; text-align: left; cursor: pointer; transition: background 0.2s;
+      gap: 10px;
+    }
+    .mm-link:hover, .mm-section-btn:hover { background: rgba(255,255,255,0.04); color: white; }
+    .mm-link-icon { font-size: 18px; width: 24px; }
+    .mm-arrow { font-size: 10px; transition: transform 0.3s; margin-left: auto; color: rgba(255,255,255,0.3); }
+    .mm-arrow.open { transform: rotate(180deg); }
+    .mm-sub {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease;
+      background: rgba(0,0,0,0.2);
+    }
+    .mm-sub.open { max-height: 500px; }
+    .mm-sub a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 22px 12px 44px;
+      color: rgba(255,255,255,0.55); text-decoration: none;
+      font-size: 13px; transition: color 0.2s;
+    }
+    .mm-sub a:hover { color: var(--orange); }
+    .mobile-menu-footer { padding: 18px 22px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; flex-direction: column; gap: 10px; }
+    .mm-footer-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 600;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .mm-wa { background: #25D366; color: white; }
+    .mm-wa:hover { background: #1da851; }
+    .mm-email { background: var(--orange); color: white; }
+    .mm-email:hover { background: var(--orange2); }
 
     /* HERO */
     .hero {
-      min-height: 100vh;
-      display: flex; align-items: center;
-      padding: 120px 48px 80px;
-      position: relative;
-      overflow: hidden;
+      min-height: 100vh; display: flex; align-items: center;
+      padding: 90px 48px 80px; position: relative; overflow: hidden;
     }
     .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 70% 60% at 65% 40%, rgba(249,115,22,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 50% at 20% 80%, rgba(249,115,22,0.06) 0%, transparent 50%);
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 65% 40%, rgba(249,115,22,0.13) 0%, transparent 60%),
+                  radial-gradient(ellipse 50% 50% at 15% 80%, rgba(249,115,22,0.07) 0%, transparent 50%);
     }
     .hero-grid {
       position: absolute; inset: 0; opacity: 0.04;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
       background-size: 60px 60px;
     }
     .hero-content { position: relative; z-index: 2; max-width: 640px; }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 8px;
       background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3);
-      padding: 6px 16px; border-radius: 100px; margin-bottom: 28px;
-      font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--orange);
+      padding: 6px 16px; border-radius: 100px; margin-bottom: 10px;
+      font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--orange);
       animation: fadeUp 0.6s ease both;
     }
-    .hero-badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
+    .hero-badge::before { content: '●'; font-size: 8px; animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .hero-since {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 11px; color: rgba(255,255,255,0.35);
+      letter-spacing: 2.5px; text-transform: uppercase;
+      margin-bottom: 22px; animation: fadeUp 0.6s 0.05s ease both;
+    }
+    .hero-since::before, .hero-since::after { content:''; height:1px; width:28px; background:rgba(255,255,255,0.15); }
     h1 {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(52px, 7vw, 88px);
-      font-weight: 800; line-height: 0.95;
-      letter-spacing: -1px;
-      margin-bottom: 24px;
+      font-size: clamp(54px, 7.5vw, 92px); font-weight: 900;
+      line-height: 0.93; letter-spacing: -1px; margin-bottom: 22px;
       animation: fadeUp 0.6s 0.1s ease both;
     }
     h1 em { font-style: normal; color: var(--orange); }
-
     .hero-sub {
-      font-size: 17px; font-weight: 300; color: rgba(255,255,255,0.6);
-      line-height: 1.7; max-width: 480px; margin-bottom: 48px;
-      animation: fadeUp 0.6s 0.2s ease both;
+      font-size: 16px; font-weight: 300; color: rgba(255,255,255,0.58);
+      line-height: 1.75; max-width: 460px; margin-bottom: 36px;
+      animation: fadeUp 0.6s 0.15s ease both;
     }
 
     /* TRACK FORM */
-    .track-form {
-      display: flex; flex-direction: column; gap: 12px;
-      animation: fadeUp 0.6s 0.3s ease both;
+    .track-form { display: flex; flex-direction: column; gap: 10px; animation: fadeUp 0.6s 0.2s ease both; }
+    .track-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+    .input-row { display: flex; }
+    .track-input {
+      flex: 1; background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12); border-right: none;
+      border-radius: 8px 0 0 8px; padding: 15px 18px;
+      color: white; font-family: 'DM Sans', sans-serif; font-size: 15px;
+      outline: none; transition: border-color 0.2s;
     }
-    .track-form label {
-      font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
-      text-transform: uppercase; color: rgba(255,255,255,0.4);
-    }
-    .input-row { display: flex; gap: 0; }
-    .track-form input {
-      flex: 1;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-right: none;
-      border-radius: 8px 0 0 8px;
-      padding: 16px 20px;
-      color: var(--white); font-family: 'DM Sans', sans-serif;
-      font-size: 15px; outline: none;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .track-form input::placeholder { color: rgba(255,255,255,0.25); }
-    .track-form input:focus {
-      border-color: var(--orange);
-      background: rgba(249,115,22,0.05);
-    }
+    .track-input::placeholder { color: rgba(255,255,255,0.22); }
+    .track-input:focus { border-color: var(--orange); background: rgba(249,115,22,0.05); }
     .track-btn {
-      background: var(--orange); color: var(--white);
-      border: none; padding: 16px 28px;
-      border-radius: 0 8px 8px 0;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 16px; font-weight: 700; letter-spacing: 1px;
-      text-transform: uppercase; cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      white-space: nowrap;
+      background: var(--orange); color: white; border: none;
+      padding: 15px 26px; border-radius: 0 8px 8px 0;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 16px;
+      font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s; white-space: nowrap;
     }
     .track-btn:hover { background: var(--orange2); }
-    .track-btn:active { transform: scale(0.98); }
+
+    /* HERO CTA BUTTONS */
+    .hero-btns {
+      display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.25s ease both;
+    }
+.hero-btn {
+      display: flex; align-items: center; gap: 8px; padding: 11px 20px;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .hero-btn-wa { background: rgba(37,211,102,0.12); border: 1px solid rgba(37,211,102,0.25); color: #25D366; }
+    .hero-btn-wa:hover { background: #25D366; color: white; transform: translateY(-2px); }
+    .hero-btn-email { background: rgba(249,115,22,0.12); border: 1px solid rgba(249,115,22,0.25); color: var(--orange); }
+    .hero-btn-email:hover { background: var(--orange); color: white; transform: translateY(-2px); }
 
     /* STATS */
     .stats-bar {
-      display: flex; gap: 48px; margin-top: 56px;
-      padding-top: 40px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      animation: fadeUp 0.6s 0.4s ease both;
+      display: flex; gap: 36px; margin-top: 44px; padding-top: 36px;
+      border-top: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
     }
-    .stat-item {}
-    .stat-num {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 36px; font-weight: 800; color: var(--white);
-    }
-    .stat-num span { color: var(--orange); }
-    .stat-label {
-      font-size: 12px; color: rgba(255,255,255,0.4);
-      font-weight: 400; letter-spacing: 0.5px;
-    }
+    .stat-num { font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 800; }
+    .stat-num em { font-style: normal; color: var(--orange); }
+    .stat-label { font-size: 12px; color: rgba(255,255,255,0.38); margin-top: 2px; }
 
-    /* HERO RIGHT - decorative */
+    /* HERO VISUAL CARDS */
     .hero-visual {
       position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-      width: 45%; pointer-events: none;
-      animation: fadeIn 1s 0.5s ease both;
+      width: 40%; pointer-events: none; animation: fadeIn 1s 0.5s ease both;
     }
     .hero-card {
-      background: rgba(30,41,59,0.7);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px; padding: 24px;
-      backdrop-filter: blur(20px);
-      margin: 12px; width: 320px;
+      background: rgba(30,41,59,0.85); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 22px; backdrop-filter: blur(20px); margin: 10px; width: 290px;
     }
-    .hero-card:first-child { margin-left: auto; margin-right: 80px; }
-    .hero-card:last-child { margin-left: 60px; }
-    .card-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .card-tag {
-      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
-      text-transform: uppercase; color: var(--orange);
-      background: rgba(249,115,22,0.1); padding: 4px 10px; border-radius: 4px;
-    }
-    .card-status-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 8px #22c55e;
-    }
-    .card-id { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; }
-    .card-route { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
-    .card-progress { background: rgba(255,255,255,0.1); border-radius: 4px; height: 4px; }
-    .card-progress-fill { background: var(--orange); height: 4px; border-radius: 4px; }
+    .hero-card:first-child { margin-left: auto; margin-right: 50px; }
+    .hero-card:last-child { margin-left: 40px; }
+    .hc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .hc-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--orange); background: rgba(249,115,22,0.1); padding: 4px 10px; border-radius: 4px; }
+    .hc-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+    .hc-id { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; }
+    .hc-route { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 14px; }
+    .hc-bar { background: rgba(255,255,255,0.1); border-radius: 4px; height: 4px; }
+    .hc-fill { height: 4px; border-radius: 4px; background: var(--orange); }
 
-    /* FEATURES SECTION */
-    .features {
-      padding: 100px 48px;
-      background: var(--navy2);
-      position: relative;
+    /* FEATURES */
+    .features { padding: 96px 48px; background: var(--navy2); }
+    .sec-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); margin-bottom: 14px; }
+    .sec-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(34px, 4vw, 52px); font-weight: 800; margin-bottom: 52px; line-height: 1.05; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .fc {
+      background: var(--slate); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px; padding: 32px 28px;
+      transition: border-color 0.25s, transform 0.25s; position: relative; overflow: hidden;
     }
-    .section-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--orange);
-      margin-bottom: 16px;
+    .fc::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--orange), transparent); opacity: 0; transition: opacity 0.25s; }
+    .fc:hover { border-color: rgba(249,115,22,0.35); transform: translateY(-5px); }
+    .fc:hover::before { opacity: 1; }
+    .fc-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(249,115,22,0.12); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 18px; }
+    .fc h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 21px; font-weight: 700; margin-bottom: 10px; }
+    .fc p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; }
+
+    /* CONTACT */
+    .contact-sec { padding: 96px 48px; background: var(--navy); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; max-width: 1040px; margin: 0 auto; }
+    .cl h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 46px; font-weight: 800; line-height: 1; margin-bottom: 14px; }
+    .cl h2 em { font-style: normal; color: var(--orange); }
+    .cl p { font-size: 15px; color: rgba(255,255,255,0.5); line-height: 1.75; margin-bottom: 28px; }
+    .ci { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; font-size: 13px; color: rgba(255,255,255,0.55); }
+    .ci-icon { width: 38px; height: 38px; border-radius: 8px; background: rgba(249,115,22,0.1); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .quick-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+    .qb {
+      display: flex; align-items: center; gap: 12px; padding: 13px 18px;
+      border-radius: 10px; font-size: 14px; font-weight: 600;
+      text-decoration: none; transition: all 0.2s;
     }
-    .section-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(36px, 4vw, 52px); font-weight: 800;
-      margin-bottom: 60px; line-height: 1.1;
+    .qb-wa { background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.2); color: #25D366; }
+    .qb-wa:hover { background: #25D366; color: white; transform: translateX(5px); }
+    .qb-em { background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.2); color: var(--orange); }
+    .qb-em:hover { background: var(--orange); color: white; transform: translateX(5px); }
+
+    /* FORM */
+    .cf { display: flex; flex-direction: column; gap: 14px; }
+    .fg { display: flex; flex-direction: column; gap: 6px; }
+    .fl { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.38); }
+    .fi {
+      width: 100%; background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      padding: 12px 14px; color: white; font-family: 'DM Sans', sans-serif;
+      font-size: 14px; outline: none; transition: border-color 0.2s; -webkit-appearance: none;
     }
-    .features-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    .fi::placeholder { color: rgba(255,255,255,0.18); }
+    .fi:focus { border-color: var(--orange); background: rgba(249,115,22,0.04); }
+    textarea.fi { resize: vertical; min-height: 120px; }
+    .fr { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .sb {
+      background: var(--orange); color: white; border: none; padding: 14px;
+      border-radius: 8px; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 17px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s; width: 100%;
     }
-    .feature-card {
-      background: var(--slate);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px; padding: 36px 32px;
-      transition: border-color 0.2s, transform 0.2s;
-      position: relative; overflow: hidden;
-    }
-    .feature-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--orange), transparent);
-      opacity: 0; transition: opacity 0.2s;
-    }
-    .feature-card:hover { border-color: rgba(249,115,22,0.3); transform: translateY(-4px); }
-    .feature-card:hover::before { opacity: 1; }
-    .feature-icon {
-      width: 48px; height: 48px; border-radius: 12px;
-      background: rgba(249,115,22,0.12);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; margin-bottom: 20px;
-    }
-    .feature-card h3 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px; font-weight: 700; margin-bottom: 10px;
-    }
-    .feature-card p {
-      font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7;
-    }
+    .sb:hover { background: var(--orange2); }
+    .sb:disabled { opacity: 0.6; cursor: not-allowed; }
+    .fa { display: none; padding: 12px 16px; border-radius: 8px; font-size: 14px; text-align: center; margin-bottom: 12px; }
+    .fa.ok { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; }
+    .fa.err { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
 
     /* FOOTER */
-    footer {
-      background: #060b14;
-      padding: 60px 48px 32px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-    .footer-top {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.06);
-      margin-bottom: 32px;
-    }
-    .footer-logo {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 28px; font-weight: 800;
-    }
-    .footer-logo span { color: var(--orange); }
-    .footer-tagline { font-size: 13px; color: rgba(255,255,255,0.35); margin-top: 6px; }
-    .footer-links { display: flex; gap: 48px; }
-    .footer-col h4 {
-      font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
-      text-transform: uppercase; color: rgba(255,255,255,0.4);
-      margin-bottom: 16px;
-    }
-    .footer-col a {
-      display: block; color: rgba(255,255,255,0.6);
-      text-decoration: none; font-size: 14px; margin-bottom: 10px;
-      transition: color 0.2s;
-    }
-    .footer-col a:hover { color: var(--white); }
-    .footer-bottom {
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .footer-copy { font-size: 13px; color: rgba(255,255,255,0.3); }
+    footer { background: #060b14; padding: 60px 48px 32px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 28px; flex-wrap: wrap; gap: 32px; }
+    .fl-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; }
+    .fl-logo span { color: var(--orange); }
+    .fl-sub { font-size: 11px; color: rgba(255,255,255,0.28); margin-top: 4px; letter-spacing: 1.5px; text-transform: uppercase; }
+    .footer-links { display: flex; gap: 48px; flex-wrap: wrap; }
+    .footer-col h4 { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 14px; }
+    .footer-col a { display: block; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 13px; margin-bottom: 10px; transition: color 0.2s; }
+    .footer-col a:hover { color: white; }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.28); }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* WHATSAPP FLOAT */
+    .wa-float {
+      position: fixed; bottom: 24px; right: 24px; z-index: 300;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #25D366; color: white; font-size: 26px;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; box-shadow: 0 4px 20px rgba(37,211,102,0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: popIn 0.5s 1s ease both;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; } to { opacity: 1; }
-    }
+    .wa-float:hover { transform: scale(1.12); box-shadow: 0 8px 30px rgba(37,211,102,0.55); }
+    @keyframes popIn { from{opacity:0;transform:scale(0.4)} to{opacity:1;transform:scale(1)} }
 
-    @media (max-width: 900px) {
-      nav { padding: 16px 24px; }
-      .nav-links { display: none; }
-      .hero { padding: 100px 24px 60px; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+    /* RESPONSIVE */
+    @media(max-width:960px) {
+      .top-bar { padding: 7px 16px; }
+      .top-bar-left { display: none; }
+      .nav-inner { padding: 0 20px; }
+      .desktop-menu, .nav-wa { display: none; }
+      .hamburger { display: flex; }
+      .hero { padding: 70px 20px 60px; }
       .hero-visual { display: none; }
-      .stats-bar { gap: 24px; flex-wrap: wrap; }
-      .features { padding: 60px 24px; }
-      .features-grid { grid-template-columns: 1fr; }
-      footer { padding: 48px 24px 24px; }
-      .footer-top { flex-direction: column; gap: 32px; }
-      .footer-links { flex-wrap: wrap; gap: 32px; }
+      .stats-bar { gap: 20px; }
+      .features { padding: 64px 20px; }
+      .features-grid { grid-template-columns: 1fr; gap: 16px; }
+      .contact-sec { padding: 64px 20px; }
+      .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+      .fr { grid-template-columns: 1fr; }
+      footer { padding: 48px 20px 24px; }
+      .footer-links { gap: 24px; }
     }
   </style>
 </head>
 <body>
 
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-left">✈️ Global Logistics & Freight — Est. 1999 — 25+ Years of Excellence</div>
+  <div class="top-bar-right">
+    <!-- TO EDIT WHATSAPP: change the number after wa.me/ below -->
+    <a href="https://wa.me/84583863560" target="_blank" class="top-bar-link">💬 WhatsApp</a>
+    <!-- TO EDIT EMAIL: change the email below -->
+    <a href="mailto:swiftfreightlogistics2026@outlook.com" class="top-bar-link">📧 Email</a>
+    <div id="google_translate_element"></div>
+  </div>
+</div>
+
+<!-- NAV -->
 <nav>
-  <div class="logo">Swift<span>Freight</span></div>
-  <ul class="nav-links">
-    <li><a href="#">Track</a></li>
-    <li><a href="#">Services</a></li>
-    <li><a href="#">Solutions</a></li>
-    <li><a href="#">About</a></li>
-  </ul>
-  <a href="/admin" class="nav-cta">Admin Portal</a>
+  <div class="nav-inner">
+    <a href="/" class="logo-wrap" style="text-decoration:none;">
+      <div class="logo">Swift<span>Freight</span></div>
+      <div class="logo-sub">Your Fast & Reliable Way · Est. 1999</div>
+    </a>
+
+    <ul class="desktop-menu">
+      <li><a href="/">🏠 Home</a></li>
+      <li>
+        <a href="#">Services <span class="arrow">▾</span></a>
+        <div class="dropdown">
+          <a href="#"><span class="dropdown-icon">✈️</span> Air Freight</a>
+          <a href="#"><span class="dropdown-icon">🚢</span> Sea Freight</a>
+          <a href="#"><span class="dropdown-icon">🚛</span> Road Freight</a>
+          <div class="dropdown-divider"></div>
+          <a href="#"><span class="dropdown-icon">🏭</span> Warehousing</a>
+          <a href="#"><span class="dropdown-icon">📦</span> Last Mile Delivery</a>
+        </div>
+      </li>
+      <li>
+<a href="#">Company <span class="arrow">▾</span></a>
+        <div class="dropdown">
+          <a href="#"><span class="dropdown-icon">👥</span> About Us</a>
+          <a href="#"><span class="dropdown-icon">💼</span> Careers</a>
+          <a href="#"><span class="dropdown-icon">📰</span> Press & Media</a>
+        </div>
+      </li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="#track">Track</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <!-- TO EDIT WHATSAPP NUMBER: change number after wa.me/ -->
+      <a href="https://wa.me/84583863560" target="_blank" class="nav-wa">💬 WhatsApp</a>
+      <a href="#track" class="nav-track">Track Shipment</a>
+      <button class="hamburger" id="hamburger" onclick="openMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
 </nav>
 
-<section class="hero">
+<!-- MOBILE OVERLAY -->
+<div class="mobile-overlay" id="overlay" onclick="closeMenu()"></div>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-header">
+    <div class="mm-logo">Swift<span>Freight</span></div>
+    <button class="mm-close" onclick="closeMenu()">✕</button>
+  </div>
+  <div class="mobile-menu-body">
+    <div class="mm-item">
+      <a href="/" class="mm-link" onclick="closeMenu()"><span class="mm-link-icon">🏠</span> Home</a>
+    </div>
+    <div class="mm-item">
+      <button class="mm-section-btn" onclick="toggleSub('sub1',this)">
+        <span class="mm-link-icon">✈️</span> Services
+        <span class="mm-arrow">▾</span>
+      </button>
+      <div class="mm-sub" id="sub1">
+        <a href="#" onclick="closeMenu()">✈️ Air Freight</a>
+        <a href="#" onclick="closeMenu()">🚢 Sea Freight</a>
+        <a href="#" onclick="closeMenu()">🚛 Road Freight</a>
+        <a href="#" onclick="closeMenu()">🏭 Warehousing</a>
+        <a href="#" onclick="closeMenu()">📦 Last Mile Delivery</a>
+      </div>
+    </div>
+    <div class="mm-item">
+      <button class="mm-section-btn" onclick="toggleSub('sub2',this)">
+        <span class="mm-link-icon">🏢</span> Company
+        <span class="mm-arrow">▾</span>
+      </button>
+      <div class="mm-sub" id="sub2">
+        <a href="#" onclick="closeMenu()">👥 About Us</a>
+        <a href="#" onclick="closeMenu()">💼 Careers</a>
+        <a href="#" onclick="closeMenu()">📰 Press & Media</a>
+      </div>
+    </div>
+    <div class="mm-item">
+      <a href="#contact" class="mm-link" onclick="closeMenu()"><span class="mm-link-icon">📞</span> Contact</a>
+    </div>
+    <div class="mm-item">
+      <a href="#track" class="mm-link" onclick="closeMenu()"><span class="mm-link-icon">🔍</span> Track Shipment</a>
+    </div>
+  </div>
+  <div class="mobile-menu-footer">
+    <!-- TO EDIT WHATSAPP: change number after wa.me/ -->
+    <a href="https://wa.me/84583863560" target="_blank" class="mm-footer-btn mm-wa">💬 Chat on WhatsApp</a>
+    <!-- TO EDIT EMAIL: change email below -->
+    <a href="mailto:swiftfreightlogistics2026@outlook.com" class="mm-footer-btn mm-email">📧 Send Email</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="track">
   <div class="hero-grid"></div>
   <div class="hero-content">
     <div class="hero-badge">Live Tracking Active</div>
+    <div class="hero-since">Est. 1999 — 25+ Years of Excellence</div>
     <h1>Move Cargo.<br><em>Track</em> Every<br>Mile.</h1>
     <p class="hero-sub">Real-time shipment visibility across air, sea, and land. Know exactly where your freight is — anytime, anywhere.</p>
 
     <form class="track-form" action="/track" method="GET">
-      <label for="trackingNumber">Enter your tracking number</label>
+      <div class="track-label">Enter your tracking number</div>
       <div class="input-row">
-        <input type="text" id="trackingNumber" name="trackingNumber"
-               placeholder="e.g. SWF-2026-00847" autocomplete="off" required />
+        <input class="track-input" type="text" name="trackingNumber" placeholder="e.g. SWF-2026-00847" autocomplete="off" required/>
         <button type="submit" class="track-btn">Track Now →</button>
       </div>
     </form>
 
+    <div class="hero-btns">
+      <a href="https://wa.me/84583863560" target="_blank" class="hero-btn hero-btn-wa">💬 WhatsApp Us</a>
+      <a href="mailto:swiftfreightlogistics2026@outlook.com" class="hero-btn hero-btn-email">📧 Email Us</a>
+    </div>
+
     <div class="stats-bar">
-      <div class="stat-item">
-        <div class="stat-num">98<span>%</span></div>
-        <div class="stat-label">On-Time Delivery</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">150<span>+</span></div>
-        <div class="stat-label">Countries Covered</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">2M<span>+</span></div>
-        <div class="stat-label">Shipments Tracked</div>
-      </div>
+      <div><div class="stat-num">25<em>+</em></div><div class="stat-label">Years Since 1999</div></div>
+      <div><div class="stat-num">150<em>+</em></div><div class="stat-label">Countries Covered</div></div>
+      <div><div class="stat-num">2M<em>+</em></div><div class="stat-label">Shipments Tracked</div></div>
+      <div><div class="stat-num">98<em>%</em></div><div class="stat-label">On-Time Delivery</div></div>
     </div>
   </div>
 
   <div class="hero-visual">
     <div class="hero-card">
-      <div class="card-row">
-        <div class="card-tag">In Transit</div>
-        <div class="card-status-dot"></div>
-      </div>
-      <div class="card-id">SWF-2026-00847</div>
-      <div class="card-route">Lagos → London Heathrow</div>
-      <div class="card-progress"><div class="card-progress-fill" style="width:68%"></div></div>
+      <div class="hc-row"><div class="hc-tag">In Transit</div><div class="hc-dot"></div></div>
+      <div class="hc-id">SWF-2026-00847</div>
+      <div class="hc-route">Lagos → London Heathrow</div>
+      <div class="hc-bar"><div class="hc-fill" style="width:68%"></div></div>
     </div>
-    <div class="hero-card" style="margin-top:16px;">
-      <div class="card-row">
-        <div class="card-tag">Delivered</div>
-        <span style="color:#22c55e; font-size:18px;">✓</span>
-      </div>
-      <div class="card-id">SWF-2026-00391</div>
-      <div class="card-route">Dubai → New York JFK</div>
-      <div class="card-progress"><div class="card-progress-fill" style="width:100%; background:#22c55e;"></div></div>
+    <div class="hero-card" style="margin-top:14px;">
+      <div class="hc-row"><div class="hc-tag">Delivered</div><span style="color:#22c55e;font-size:18px;">✓</span></div>
+      <div class="hc-id">SWF-2026-00391</div>
+      <div class="hc-route">Dubai → New York JFK</div>
+      <div class="hc-bar"><div class="hc-fill" style="width:100%;background:#22c55e;"></div></div>
     </div>
   </div>
 </section>
 
+<!-- FEATURES -->
 <section class="features">
-  <div class="section-label">Why SwiftFreight</div>
-  <div class="section-title">Built for Speed.<br>Designed for Trust.</div>
+  <div class="sec-label">Why SwiftFreight</div>
+  <div class="sec-title">Built for Speed.<br>Designed for Trust.</div>
   <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">🗺️</div>
-      <h3>Live Map Tracking</h3>
-      <p>See your shipment's exact position on an interactive map updated in real time across every checkpoint.</p>
+    <div class="fc"><div class="fc-icon">🗺️</div><h3>Live Map Tracking</h3><p>See your shipment's exact position on an interactive map updated in real time across every checkpoint.</p></div>
+    <div class="fc"><div class="fc-icon">✈️</div><h3>Air & Sea Freight</h3><p>Full visibility across multimodal logistics — air cargo, ocean freight, and last-mile land delivery.</p></div>
+    <div class="fc"><div class="fc-icon">🔔</div><h3>Instant Alerts</h3><p>Proactive notifications at every milestone so you're never in the dark about your shipment.</p></div>
+    <div class="fc"><div class="fc-icon">🔒</div><h3>Secure Handling</h3><p>Every package insured and handled with strict chain-of-custody protocols end to end.</p></div>
+    <div class="fc"><div class="fc-icon">📦</div><h3>All Cargo Types</h3><p>From documents to oversized freight — we handle any volume, any weight, any destination.</p></div>
+    <div class="fc"><div class="fc-icon">🌍</div><h3>Global Network</h3><p>Over 150 countries in our network with trusted local partners for smooth last-mile delivery.</p></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-sec" id="contact">
+  <div class="contact-grid">
+    <div class="cl">
+      <div class="sec-label">Get In Touch</div>
+      <h2>Ship With <em>Confidence.</em></h2>
+      <p>Have a question or want to work with us? Reach us instantly on WhatsApp or email — we respond within hours.</p>
+      <div class="ci"><div class="ci-icon">📧</div><span>swiftfreightlogistics2026@outlook.com</span></div>
+      <div class="ci"><div class="ci-icon">💬</div><span>WhatsApp: +84 58 386 3560</span></div>
+      <div class="ci"><div class="ci-icon">🌍</div><span>Serving 150+ countries worldwide</span></div>
+      <div class="ci"><div class="ci-icon">📅</div><span>Est. 1999 — 25+ Years of Service</span></div>
+      <div class="quick-btns">
+        <a href="https://wa.me/84583863560" target="_blank" class="qb qb-wa">💬 Chat on WhatsApp — Fastest Response</a>
+        <a href="mailto:swiftfreightlogistics2026@outlook.com" class="qb qb-em">📧 Send us an Email</a>
+      </div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">✈️</div>
-      <h3>Air & Sea Freight</h3>
-      <p>Full visibility across multimodal logistics — air cargo, ocean freight, and last-mile land delivery.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔔</div>
-      <h3>Instant Alerts</h3>
-      <p>Proactive notifications at every milestone so you're never in the dark about your shipment.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔒</div>
-      <h3>Secure Handling</h3>
-      <p>Every package insured and handled with strict chain-of-custody protocols end to end.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📦</div>
-      <h3>All Cargo Types</h3>
-      <p>From documents to oversized freight — we handle any volume, any weight, any destination.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🌍</div>
-      <h3>Global Network</h3>
-      <p>Over 150 countries in our network with trusted local partners for smooth last-mile delivery.</p>
+    <div>
+      <div id="fok" class="fa ok">✅ Message sent! We'll reply within 24 hours.</div>
+      <div id="ferr" class="fa err">❌ Error sending. Please WhatsApp or email us directly.</div>
+      <form class="cf" id="contactForm">
+        <div class="fr">
+          <div class="fg"><label class="fl">First Name</label><input class="fi" name="firstName" placeholder="John" required/></div>
+          <div class="fg"><label class="fl">Last Name</label><input class="fi" name="lastName" placeholder="Smith" required/></div>
+        </div>
+        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" name="email" placeholder="john@example.com" required/></div>
+        <div class="fg">
+          <label class="fl">Subject</label>
+          <select class="fi" name="subject">
+            <option>Shipment Enquiry</option>
+            <option>Tracking Help</option>
+            <option>Lost Package</option>
+            <option>Business Partnership</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Tracking Number (optional)</label><input class="fi" name="trackingNumber" placeholder="e.g. SWF-2026-00001"/></div>
+        <div class="fg"><label class="fl">Message</label><textarea class="fi" name="message" placeholder="How can we help you?" required></textarea></div>
+        <button type="submit" class="sb">Send Message →</button>
+      </form>
     </div>
   </div>
 </section>
 
+<!-- FOOTER -->
 <footer>
   <div class="footer-top">
     <div>
-      <div class="footer-logo">Swift<span>Freight</span></div>
-      <div class="footer-tagline">Moving the world's cargo, reliably.</div>
+      <div class="fl-logo">Swift<span>Freight</span></div>
+      <div class="fl-sub">Your Fast & Reliable Way · Est. 1999</div>
     </div>
     <div class="footer-links">
       <div class="footer-col">
         <h4>Company</h4>
-        <a href="#">About Us</a>
-        <a href="#">Careers</a>
-        <a href="#">Press</a>
+        <a href="#">About Us</a><a href="#">Careers</a><a href="#">Press</a>
       </div>
       <div class="footer-col">
         <h4>Services</h4>
-        <a href="#">Air Freight</a>
-        <a href="#">Sea Freight</a>
-        <a href="#">Warehousing</a>
+        <a href="#">Air Freight</a><a href="#">Sea Freight</a><a href="#">Warehousing</a>
       </div>
       <div class="footer-col">
         <h4>Support</h4>
-        <a href="#">Track Shipment</a>
-        <a href="#">Contact Us</a>
-        <a href="/admin">Admin Login</a>
+        <a href="#track">Track Shipment</a>
+        <a href="#contact">Contact Us</a>
+        <a href="https://wa.me/84583863560" target="_blank">WhatsApp</a>
       </div>
     </div>
   </div>
   <div class="footer-bottom">
-    <div class="footer-copy">© 2026 SwiftFreight Logistics. All rights reserved.</div>
+    <div class="footer-copy">© 2026 SwiftFreight Logistics. Est. 1999. All rights reserved.</div>
     <div class="footer-copy">Privacy · Terms · Cookies</div>
   </div>
 </footer>
 
+<!-- FLOATING WHATSAPP -->
+<!-- TO EDIT: change number after wa.me/ -->
+<a href="https://wa.me/84583863560" target="_blank" class="wa-float" title="Chat on WhatsApp">💬</a>
+
+<script>
+  // ---- MOBILE MENU ----
+  function openMenu() {
+    document.getElementById('mobileMenu').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('hamburger').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function toggleSub(id, btn) {
+    document.getElementById(id).classList.toggle('open');
+    btn.querySelector('.mm-arrow').classList.toggle('open');
+  }
+
+  // ---- CONTACT FORM ----
+  document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('.sb');
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: this.firstName.value,
+          lastName: this.lastName.value,
+          email: this.email.value,
+          subject: this.subject.value,
+          trackingNumber: this.trackingNumber.value,
+          message: this.message.value
+        })
+      });
+      const r = await res.json();
+      if (r.success) {
+        document.getElementById('fok').style.display = 'block';
+        document.getElementById('ferr').style.display = 'none';
+        this.reset();
+      } else {
+        document.getElementById('ferr').style.display = 'block';
+      }
+    } catch(err) {
+      document.getElementById('ferr').style.display = 'block';
+    }
+    btn.textContent = 'Send Message →';
+    btn.disabled = false;
+  });
+</script>
 </body>
 </html>

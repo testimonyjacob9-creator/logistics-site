@@ -1,11 +1,192 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+﻿const express = require('express');
+const path = require('path');
+const Database = require('better-sqlite3');
+const nodemailer = require('nodemailer');
 
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: #0a0f1e;
-  color: #ffffff;
-}
+const app = express();
+const db = new Database(path.join(__dirname, 'tracking.db'));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// ---- EMAIL SETUP ----
+const transporter = nodemailer.createTransport({
+  host: 'smtp-mail.outlook.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: 'swiftfreightlogistics2026@outlook.com',
+    pass: process.env.EMAIL_PASS
+  },
+  tls: { ciphers: 'SSLv3' }
+});
+
+// ---- DATABASE SETUP ----
+db.exec(`
+  CREATE TABLE IF NOT EXISTS shipments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tracking_number TEXT UNIQUE NOT NULL,
+    sender_name TEXT,
+    recipient_name TEXT,
+    origin TEXT,
+    destination TEXT,
+    status TEXT DEFAULT 'Pending',
+    weight REAL,
+    service_type TEXT,
+    estimated_delivery TEXT,
+    lat REAL,
+    lng REAL,
+    location_name TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
+// Safe column additions for existing databases
+const addCol = (col, type) => {
+  try { db.exec(`ALTER TABLE shipments ADD COLUMN ${col} ${type}`); } catch(e) {}
+};
+addCol('lat', 'REAL');
+addCol('lng', 'REAL');
+addCol('location_name', 'TEXT');
+addCol('sender_name', 'TEXT');
+addCol('recipient_name', 'TEXT');
+addCol('origin', 'TEXT');
+addCol('destination', 'TEXT');
+addCol('weight', 'REAL');
+addCol('service_type', 'TEXT');
+addCol('estimated_delivery', 'TEXT');
+
+// ==============================
+//           ROUTES
+// ==============================
+
+// Home page
+app.get('/', (req, res) => {
+  res.render('index');
+});
+
+// Track shipment
+app.get('/track', (req, res) => {
+  const { trackingNumber } = req.query;
+  const shipment = db.prepare(
+    'SELECT * FROM shipments WHERE tracking_number = ?'
+  ).get(trackingNumber);
+  res.render('result', { shipment: shipment || null });
+});
+
+// ---- ADMIN (hidden URL - only you know this) ----
+app.get('/swiftadmin2026', (req, res) => {
+  const shipments = db.prepare('SELECT * FROM shipments ORDER BY created_at DESC').all();
+  res.render('admin', { shipments });
+});
+// Also keep /admin working as backup
+app.get('/admin', (req, res) => {
+  const shipments = db.prepare('SELECT * FROM shipments ORDER BY created_at DESC').all();
+  res.render('admin', { shipments });
+});
+
+// ---- ADD SHIPMENT ----
+app.post('/add-shipment', (req, res) => {
+  const {
+    tracking_number, sender_name, recipient_name,
+    origin, destination, status, weight,
+    service_type, estimated_delivery
+  } = req.body;
+  try {
+    db.prepare(`
+      INSERT INTO shipments
+        (tracking_number, sender_name, recipient_name, origin, destination,
+         status, weight, service_type, estimated_delivery)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      tracking_number, sender_name, recipient_name,
+      origin, destination, status || 'Pending',
+      weight, service_type, estimated_delivery
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
+  }
+});
+
+// ---- UPDATE LOCATION ----
+app.post('/update-location', (req, res) => {
+  const { trackingNumber, lat, lng, locationName, status } = req.body;
+  const existing = db.prepare(
+    'SELECT id FROM shipments WHERE tracking_number = ?'
+  ).get(trackingNumber);
+  if (!existing) return res.json({ success: false, message: 'Tracking number not found' });
+
+  if (status) {
+    db.prepare(`
+      UPDATE shipments SET lat=?, lng=?, location_name=?, status=? WHERE tracking_number=?
+    `).run(lat, lng, locationName, status, trackingNumber);
+  } else {
+    db.prepare(`
+      UPDATE shipments SET lat=?, lng=?, location_name=? WHERE tracking_number=?
+    `).run(lat, lng, locationName, trackingNumber);
+  }
+  res.json({ success: true });
+});
+
+// ---- DELETE SHIPMENT ----
+app.post('/delete-shipment', (req, res) => {
+  const { trackingNumber } = req.body;
+  try {
+    db.prepare('DELETE FROM shipments WHERE tracking_number = ?').run(trackingNumber);
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
+  }
+});
+
+// ---- CONTACT FORM (sends email to your Outlook) ----
+app.post('/contact', async (req, res) => {
+  const { firstName, lastName, email, subject, trackingNumber, message } = req.body;
+
+  const mailOptions = {
+    from: 'swiftfreightlogistics2026@outlook.com',
+    to: 'swiftfreightlogistics2026@outlook.com',
+    subject: `SwiftFreight Enquiry: ${subject} — ${firstName} ${lastName}`,
+    replyTo: email,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+        <div style="background:#0a0f1e;padding:28px;border-radius:10px 10px 0 0;">
+          <h1 style="color:#f97316;font-size:26px;margin:0;font-family:'Arial Black',sans-serif;">SwiftFreight</h1>
+          <p style="color:rgba(255,255,255,0.5);margin:4px 0 0;font-size:13px;">New Contact Form Submission</p>
+        </div>
+        <div style="background:#f9fafb;padding:28px;border-radius:0 0 10px 10px;border:1px solid #e5e7eb;border-top:none;">
+          <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+            <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:13px;width:130px;">Full Name</td><td style="padding:10px 0;border-bottom:1px solid #e5e7eb;font-weight:600;color:#111827;">${firstName} ${lastName}</td></tr>
+            <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:13px;">Email</td><td style="padding:10px 0;border-bottom:1px solid #e5e7eb;"><a href="mailto:${email}" style="color:#f97316;">${email}</a></td></tr>
+            <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:13px;">Subject</td><td style="padding:10px 0;border-bottom:1px solid #e5e7eb;color:#111827;">${subject}</td></tr>
+            <tr><td style="padding:10px 0;color:#6b7280;font-size:13px;">Tracking #</td><td style="padding:10px 0;color:#111827;">${trackingNumber || 'Not provided'}</td></tr>
+          </table>
+          <div style="background:white;padding:20px;border-radius:8px;border-left:4px solid #f97316;">
+            <p style="color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Message</p>
+            <p style="color:#374151;line-height:1.7;margin:0;">${message}</p>
+          </div>
+          <p style="color:#9ca3af;font-size:12px;margin-top:20px;">Hit Reply to respond directly to ${firstName}.</p>
+        </div>
+      </div>
+    `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Email error:', err.message);
+    // Still return success so site doesn't break if email not configured yet
+    res.json({ success: true });
+  }
+});
+
+// ---- START SERVER ----
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`SwiftFreight running → http://localhost:${PORT}`);
+});
