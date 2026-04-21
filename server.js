@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const Database = require('better-sqlite3');
+const nodemailer = reqire('nodemailer');
 
 const app = express();
 const db = new Database(path.join(__dirname, 'tracking.db'));
@@ -32,9 +33,19 @@ db.exec(`
   )
 `);
 
+const transporter = nodemailer.createtransport({
+  host: 'smtp.office365.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER
+    pass: process.env.EMAIL_PASS
+  }
+});
+
 // Add columns if upgrading from old DB (safe to run every time)
 const addColSafe = (col, type) => {
-  try { db.exec(`ALTER TABLE shipments ADD COLUMN ${col} ${type}`); } catch(e) {}
+  try { db.exec(`ALTER TABLE shipments ADD COLUMN ${col} ${type}`); { ('lat', catch(e) {}
 };
 addColSafe('lat', 'REAL');
 addColSafe('lng', 'REAL');
